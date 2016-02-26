@@ -18,8 +18,7 @@ import datetime as dt
 import time
 
 #Get the path of where this actual script file is (regardless of where it is being run from)
-thisfilepath = os.path.dirname(os.path.realpath(__file__)) + '\\'
-print thisfilepath
+thisfilepath = os.path.dirname(os.path.realpath(__file__))
 
 #Define all of the custom functions used in the script file using "def". 
 #Note that these pieces of code do not actually run when they are being "defined" -
@@ -53,9 +52,9 @@ def loadtransactionlog(inputpath, successonly = True, renamedict = {},
 
 	#Load the transaction log, which has been downloaded by months from the server
 	firstfile=True
-	for filename in os.listdir(inputpath + 'ScratchcardTransactions'):
+	for filename in os.listdir(os.path.join(inputpath,'ScratchcardTransactions')):
 		if filename.endswith('.csv'): #Ignore random hidden files which can appear
-			newtrans = pd.read_csv(inputpath + 'ScratchcardTransactions/' + filename,low_memory=False)
+			newtrans = pd.read_csv(os.path.join(inputpath,'ScratchcardTransactions',filename),low_memory=False)
 			if firstfile:
 				translog=newtrans
 				firstfile=False #Do concat for future files
@@ -101,7 +100,9 @@ def renamecolumns(translog, filepath):
 	'''
 	#Rename the columns according to the spreadsheet
 	#How do I find the path that this particular file is stored in?
-	replacedict = pd.read_excel(filepath + 'Operating Column Names.xlsx', sheetname='translog').set_index('As_loaded').to_dict()['Operating']
+
+
+	replacedict = pd.read_excel(os.path.join(thisfilepath, 'Operating Column Names.xlsx'), sheetname='translog').set_index('As_loaded').to_dict()['Operating']
 	return translog.rename(columns = replacedict)
 
 def topupvalues(translog, filepath):
@@ -112,7 +113,7 @@ def topupvalues(translog, filepath):
     4 = 4 weeks
     (5 = unlock, but I haven't put this as a value)
     '''
-    valuedict = pd.read_excel(filepath + 'Operating Column Names.xlsx', sheetname='topupvalues').set_index('functioncode').to_dict()['value']
+    valuedict = pd.read_excel(os.path.join(filepath,'Operating Column Names.xlsx'), sheetname='topupvalues').set_index('functioncode').to_dict()['value']
 	
     #Every row where the function is no in this 
     translog['topupvalue']=None
